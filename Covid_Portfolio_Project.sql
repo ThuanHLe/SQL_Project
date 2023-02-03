@@ -26,3 +26,20 @@ SELECT location, MAX(total_cases) as HighestInfectionCount, population, MAX(tota
 FROM Covid19.coviddeaths
 GROUP BY Location, population
 ORDER BY Max_Infectionrate DESC;
+
+-- Showing Countries with Highest Death Count per Population
+-- Cast Total_deaths to INT, some location values appear as ASIA while the continent is NULL
+SELECT location, MAX(cast(total_deaths as signed)) as TotalDeathCount
+FROM Covid19.coviddeaths
+WHERE continent is not null
+GROUP BY location
+ORDER BY TotalDeathCount desc;
+
+-- LET'S BREAK THINGS DOWN BY CONTINENT
+-- Continent with the highest death count per population
+
+SELECT continent, MAX(cast(total_deaths as signed)) as TotalDeathCount
+FROM Covid19.coviddeaths
+WHERE continent is not null
+GROUP by continent
+ORDER BY TotalDeathCount DESC;
