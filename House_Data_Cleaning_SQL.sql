@@ -41,3 +41,29 @@ JOIN Housing.NashvilleHouse b
 WHERE a.PropertyAddress is null;
 
 -------------
+-- Breaking out Address into Separated Columns (Addess, City, State)
+
+SELECT PropertyAddress
+FROM Housing.NashvilleHouse;
+-- WHERE PropertyAddress is null
+-- ORDER BY ParcelID;
+
+SELECT
+SUBSTRING(PropertyAddress, 1, Charindex(',', PropertyAddress, -1 )) AS Address,
+SUBSTRING(PropertyAddress, Charindex(',', PropertyAddress, +1, LEN(PropertyAddress))
+FROM Housing.NashvilleHouse;
+
+ALTER TABLE NashvilleHouse
+Add PropertySplitAddress Nvarchar(255);
+
+Update Nashvillehouse
+SET PropertySplitAddress = SUBSTRING(PropertyAddress, 1, Charindex(',', PropertyAddress, -1 ));
+
+ALTER TABLE NashvilleHouse
+Add PropertySplitCity Nvarchar(255);
+
+Update Nashvillehouse
+SET PropertySplitCity = SUBSTRING(PropertyAddress, Charindex(',', PropertyAddress, +1, LEN(PropertyAddress);
+
+SELECT *
+FROM Housing.NashvilleHouse;
