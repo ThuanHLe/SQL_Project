@@ -72,3 +72,33 @@ WHERE dea.continent is not null
 )
 SELECT *,(RollingPeopleVaccinated/population)*100
 FROM PopvsVac;
+
+-- Looking at the Vaccination Rate and Total Death Rate
+SELECT dea.location, dea.population, dea.date, vac.total_vaccinations, (vac.total_vaccinations/population) as VaccinationRate, (dea.total_deaths/population) as TotalDeathRate
+FROM Covid19.coviddeaths dea
+JOIN Covid19.covidvaccinations vac
+ON dea.location = vac.location
+AND dea.date = vac.date
+WHERE dea.continent is not null
+ORDER BY location;
+
+-- TEMP TABLE
+-- Problem: unable to change datatype for table Covid19's column
+DROP table if exists PercentPeopleVaccinated;
+CREATE table PercentPeopleVaccinated
+(continent nvarchar (255),
+Location nvarchar (255),
+Date datetime,
+Population numeric,
+New_vaccinations numeric,
+RollingPeopleVaccinated numeric
+);
+INSERT INTO PercentPeopleVaccinated
+SELECT dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations, SUM(new_vaccinations) OVER (partition by dea.location ORDER BY dea.location) as RollingPeopleVaccinated
+-- , (RollingPeopleVaccinated/population)*100
+FROM Covid19.coviddeaths dea
+JOIN Covid19.covidvaccinations vac
+ON dea.location = vac.location
+AND dea.date = vac.date
+WHERE dea.continent is not null;
+-- ORDER BY location, date
