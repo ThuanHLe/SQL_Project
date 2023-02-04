@@ -43,3 +43,32 @@ FROM Covid19.coviddeaths
 WHERE continent is not null
 GROUP by continent
 ORDER BY TotalDeathCount DESC;
+
+-- GLOBAL NUMBERS
+SELECT SUM(new_cases) AS newcases, SUM(new_deaths) as newdeaths, SUM(new_deaths)/SUM(new_cases)*100 AS NewDeathPercentage
+FROM Covid19.coviddeaths
+WHERE continent is not null;
+-- GROUP BY date
+
+-- Looking at Total Population vs. Vaccinations (JOIN)
+SELECT dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations
+FROM Covid19.coviddeaths dea
+JOIN Covid19.covidvaccinations vac
+ON dea.location = vac.location
+AND dea.date = vac.date
+ORDER BY location, date;
+
+-- USE CTE
+WITH PopvsVac (Continent, Location, Date, Population, New_vaccinations, RollingPeopleVaccinated)
+as
+(
+SELECT dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations, SUM(new_vaccinations) OVER (partition by dea.location ORDER BY dea.location) as RollingPeopleVaccinated
+FROM Covid19.coviddeaths dea
+JOIN Covid19.covidvaccinations vac
+ON dea.location = vac.location
+AND dea.date = vac.date
+WHERE dea.continent is not null
+-- ORDER BY location, date
+)
+SELECT *,(RollingPeopleVaccinated/population)*100
+FROM PopvsVac;
