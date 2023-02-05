@@ -102,3 +102,21 @@ ON dea.location = vac.location
 AND dea.date = vac.date
 WHERE dea.continent is not null;
 -- ORDER BY location, date
+
+-- PROBLEM: database is not selected
+SHOW databases;
+USE Covid19;
+
+-- Create VIEW to store data for later visualizations
+Create view PercentPopulationVaccinated AS
+SELECT dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations, SUM(new_vaccinations) OVER (partition by dea.location ORDER BY dea.location) as RollingPeopleVaccinated
+-- , (RollingPeopleVaccinated/population)*100
+FROM Covid19.coviddeaths as dea
+JOIN Covid19.covidvaccinations as vac
+ON dea.location = vac.location
+AND dea.date = vac.date
+WHERE dea.continent is not null;
+-- order by 2,3
+
+SELECT * 
+FROM Covid19.percentpopulationvaccinated;
